@@ -4,8 +4,16 @@ import (
 	"fmt"
 	"go-api/config"
 	"go-api/database"
+	"go-api/domain/entities/class"
+	"go-api/domain/entities/user"
 	"log"
 )
+
+var models = []interface{}{
+	user.User{},
+	class.Class{},
+	class.Schedule{},
+}
 
 func main() {
 	err := config.LoadConfig()
@@ -20,11 +28,15 @@ func main() {
 		log.Fatal("Error when stabilishing connection to the database")
 	}
 
-	db := database.GetDBSession()
+	log.Println("Applying migrations...")
+	fmt.Println()
 
-	if db == nil {
-		return
+	for _, model := range models {
+		database.ApplyMigrations(model)
 	}
 
-	fmt.Println(db.Name())
+	fmt.Println()
+	log.Println("Migrations finished")
+
+	defer database.Close()
 }
