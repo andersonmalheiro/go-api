@@ -1,3 +1,10 @@
+/*
+ * ----- Authors -----
+ * marcelobezer
+ * cahe7cb
+ * washingt0
+ */
+
 package utils
 
 import (

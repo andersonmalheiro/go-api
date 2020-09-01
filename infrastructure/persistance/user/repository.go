@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"go-api/domain/entities/user"
 	"go-api/infrastructure/persistance/user/postgres"
 
@@ -13,6 +14,8 @@ type Repository struct{}
 
 // Add is a function that manage the flow of user insertion into database
 func (r *Repository) Add(in *user.User, db *gorm.DB) error {
+	fmt.Printf("\nRepo in:  %+v\n", in)
+
 	data := postgres.PGUser{DB: db}
 	return data.Add(in)
 }

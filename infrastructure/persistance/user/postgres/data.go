@@ -1,8 +1,9 @@
 package postgres
 
 import (
+	"fmt"
 	"go-api/domain/entities/user"
-	"log"
+	"go-api/oops"
 
 	"gorm.io/gorm"
 )
@@ -15,8 +16,9 @@ type PGUser struct {
 
 // Add insert an user into the database
 func (pg *PGUser) Add(in *user.User) (err error) {
+	fmt.Printf("\nPGUser in:  %+v\n", in)
 	if err := pg.DB.Create(in).Scan(&in); err != nil {
-		log.Println(err.Error)
+		return oops.Err(err.Error)
 	}
 	return nil
 }

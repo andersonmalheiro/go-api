@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
-	app "go-api/application/entities/user"
 	"go-api/config"
 	"go-api/database"
 	"go-api/domain/entities/class"
 	"go-api/domain/entities/user"
+	userRoutes "go-api/interfaces/entities/user"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 var models = []interface{}{
@@ -43,17 +45,13 @@ func main() {
 	fmt.Println()
 	log.Println("Migrations finished")
 
-	// Testing user insertion
-	// Remove later
-	var user app.INUser
+	r := gin.New()
 
-	id, err := app.Add(&user)
+	r.Use(gin.Logger())
 
-	if err != nil {
-		return
-	}
+	v1 := r.Group("v1")
 
-	fmt.Printf("user id %v\n", id)
-	// Testing user insertion
-	// Remove later
+	userRoutes.Router(v1.Group("/users"))
+
+	r.Run()
 }
