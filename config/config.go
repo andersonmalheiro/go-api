@@ -39,12 +39,12 @@ func LoadConfig() error {
 
 	raw, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 
 	if err := json.Unmarshal(raw, &config); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 
@@ -54,7 +54,7 @@ func LoadConfig() error {
 // GetConfig returns the config data
 func GetConfig() *ApiConfig {
 	if config == nil {
-		log.Fatal("Configuration not loaded")
+		log.Println("Configuration not loaded")
 	}
 
 	return config
