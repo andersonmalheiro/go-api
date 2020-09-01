@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"go-api/config"
 	"log"
 	"reflect"
@@ -26,7 +27,7 @@ func Open() error {
 	sqlDB, err := sql.Open("postgres", dsn)
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -34,32 +35,45 @@ func Open() error {
 
 	db, err = gorm.Open(postgres.New(postgres.Config{
 		Conn: sqlDB,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 
 	if err != nil {
-		log.Fatal("GORM failed to initialize database with current connection")
+		log.Println("GORM failed to initialize database with current connection")
 		return err
 	}
 
 	return nil
 }
 
+// NewTransaction start a new transaction
+func NewTransaction() (*gorm.DB, error) {
+	if db == nil {
+		log.Println("Database not connected")
+		return nil, errors.New("Database not connected")
+	}
+
+	tx := db.Session(&gorm.Session{SkipDefaultTransaction: true})
+
+	return tx, nil
+}
+
 // Close tries to close the current connectin
 func Close() {
 	if sqlDB == nil {
-		log.Fatal("Database not connected")
+		log.Println("Database not connected")
+		return
 	}
-
 	sqlDB.Close()
 }
 
 // GetDBSession returns the current database opened session
 func GetDBSession() *gorm.DB {
 	if db == nil {
-		log.Fatal("Database not connected.")
+		log.Println("Database not connected.")
 		return nil
 	}
-
 	return db
 }
 
@@ -70,8 +84,9 @@ func ApplyMigrations(model interface{}) {
 	err := db.AutoMigrate(model)
 
 	if err != nil {
-		log.Fatal("Failed applying migrations.")
-	} else {
-		log.Printf("Migrations applied successfully for model %v\n", modelType)
+		log.Println("Failed applying migrations.")
+		return
 	}
+
+	log.Printf("Migrations applied successfully for model %v\n", modelType)
 }
