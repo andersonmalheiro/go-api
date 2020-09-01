@@ -7,6 +7,7 @@ import (
 	repository "go-api/infrastructure/persistance/user"
 	"go-api/oops"
 	"go-api/utils"
+	"log"
 )
 
 // Add do the business logic of inserting an user into the database
@@ -18,7 +19,7 @@ func Add(in *INUser) (id uint, err error) {
 	tx, err := database.NewTransaction()
 
 	if err != nil {
-		return id, oops.Wrap(err, "Erro when adding new user.")
+		return id, oops.Wrap(err, "Error when initializing transaction.")
 	}
 
 	defer tx.Rollback()
@@ -26,16 +27,17 @@ func Add(in *INUser) (id uint, err error) {
 	data := &domain.User{}
 
 	if err = utils.ConvertStruct(in, data); err != nil {
-		return id, oops.Wrap(err, "Erro when adding new user.")
+		log.Println(err)
+		return id, oops.Wrap(err, "Error when converting struct.")
 	}
 
 	fmt.Printf("\nBusiness data:  %+v\n", data)
 
 	if err = repo.Add(data, tx); err != nil {
-		return id, oops.Wrap(err, "Erro when adding new user.")
+		return id, oops.Wrap(err, "Error when adding new user.")
 	}
 
 	tx.Commit()
 
-	return data.ID, nil
+	return *data.ID, nil
 }
